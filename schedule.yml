@@ -15,4 +15,4 @@ jobs:
         run: |
           sudo apt-get install -y python3-pip
           pip3 install google-auth requests pandas google-api-python-client
-          python3 your-script.py
+          python3 _200.ipynb
