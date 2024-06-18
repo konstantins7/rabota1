@@ -11,8 +11,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Run Colab Script
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
         run: |
-          sudo apt-get install -y python3-pip
-          pip3 install google-auth requests pandas google-api-python-client
-          python3 _200.ipynb
+          python -m pip install --upgrade pip
+          pip install nbconvert
+          pip install google-auth requests pandas google-api-python-client
+
+      - name: Execute Jupyter Notebook
+        run: |
+          jupyter nbconvert --to notebook --execute _200.ipynb --output result.ipynb
