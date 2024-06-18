@@ -1,0 +1,18 @@
+name: Schedule Colab Script
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  run-colab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run Colab Script
+        run: |
+          sudo apt-get install -y python3-pip
+          pip3 install google-auth requests pandas google-api-python-client
+          python3 your-script.py
