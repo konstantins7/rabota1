@@ -24,10 +24,10 @@ jobs:
 
       - name: Execute Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute _200.ipynb --output result.ipynb
+          jupyter nbconvert --to notebook --execute __200.ipynb --output result.ipynb
 
       - name: Save log file
         uses: actions/upload-artifact@v2
         with:
           name: script-log
-          path: /content/drive/My Drive/script_log.log
+          path: /content/drive/MyDrive/Colab Notebooks/indexing_log.txt
