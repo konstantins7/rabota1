@@ -2,7 +2,8 @@ name: Schedule Colab Script
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    # Запуск в 9 утра и 9 вечера по UTC
+    - cron: '0 10,22 * * *'
 
 jobs:
   run-colab:
