@@ -2,8 +2,7 @@ name: Schedule Colab Script
 
 on:
   schedule:
-    # Запуск в 9 утра и 9 вечера по UTC
-    - cron: '0 10,22 * * *'
+    - cron: '0 11,23 * * *'
 
 jobs:
   run-colab:
@@ -26,3 +25,8 @@ jobs:
       - name: Execute Jupyter Notebook
         run: |
           jupyter nbconvert --to notebook --execute _200.ipynb --output result.ipynb
+      - name: Upload result notebook
+        uses: actions/upload-artifact@v2
+        with:
+          name: result-notebook
+          path: result.ipynb
