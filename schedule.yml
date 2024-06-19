@@ -25,8 +25,9 @@ jobs:
       - name: Execute Jupyter Notebook
         run: |
           jupyter nbconvert --to notebook --execute _200.ipynb --output result.ipynb
-      - name: Upload result notebook
+
+      - name: Save log file
         uses: actions/upload-artifact@v2
         with:
-          name: result-notebook
-          path: result.ipynb
+          name: script-log
+          path: /content/drive/My Drive/script_log.log
