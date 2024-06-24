@@ -1,9 +1,8 @@
-name: Schedule Colab Script
+name: Schedule Colab Script for med.vitrina24.kz
 
 on:
   schedule:
-    - cron: '0 11,23 * * *'
-
+    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC
 
 jobs:
   run-colab:
@@ -21,14 +20,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install nbconvert
-          pip install google-auth requests pandas google-api-python-client
+          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
       - name: Execute Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute __200.ipynb --output result.ipynb
+          jupyter nbconvert --to notebook --execute med__200.ipynb --output result.ipynb
 
       - name: Save log file
         uses: actions/upload-artifact@v2
         with:
           name: script-log
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log.txt
+          path: /content/drive/MyDrive/Colab Notebooks/medvitrina24_indexing_log.txt
