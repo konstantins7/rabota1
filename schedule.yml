@@ -1,12 +1,12 @@
-name: Schedule Colab Script for vitrina24.kz and med.vitrina24.kz
+name: Schedule Colab Scripts for vitrina24.kz and med.vitrina24.kz
 
 on:
   schedule:
-    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC для med.vitrina24.kz
-    - cron: '0 9,21 * * *'  # Запуск в 9 утра и 9 вечера по UTC для vitrina24.kz
+    - cron: '0 7,19 * * *'  # Запуск в 7 утра и 7 вечера по UTC для med.vitrina24.kz
+    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC для vitrina24.kz
 
 jobs:
-  run-colab:
+  run-medvitrina24:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -23,12 +23,39 @@ jobs:
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Execute Jupyter Notebook
+      - name: Execute med.vitrina24.kz Notebook
         run: |
-          jupyter nbconvert --to notebook --execute vitrina__200.ipynb --output result.ipynb
+          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb
 
-      - name: Save log file
+      - name: Save log file for med.vitrina24.kz
         uses: actions/upload-artifact@v2
         with:
-          name: script-log
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log.txt
+          name: medvitrina24-log
+          path: /content/gdrive/MyDrive/Colab Notebooks/indexing_log.txt
+
+  run-vitrina24:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbconvert
+          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
+
+      - name: Execute vitrina24.kz Notebook
+        run: |
+          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina24.ipynb
+
+      - name: Save log file for vitrina24.kz
+        uses: actions/upload-artifact@v2
+        with:
+          name: vitrina24-log
+          path: /content/gdrive/MyDrive/Colab Notebooks/indexing_log.txt
