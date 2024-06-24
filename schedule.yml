@@ -1,61 +1,47 @@
-name: Планирование скриптов для vitrina24.kz и med.vitrina24.kz
-
 on:
   schedule:
-    - cron: '5 7,19 * * *'   # Запуск в 7:05 утра и 7:05 вечера по UTC для med.vitrina24.kz
-    - cron: '5 8,20 * * *'   # Запуск в 8:05 утра и 8:05 вечера по UTC для vitrina24.kz
+    - cron: '5 7,19 * * *'   # Запуск в 7:05 и 19:05 UTC
+    - cron: '5 8,20 * * *'   # Запуск в 8:05 и 20:05 UTC
 
 jobs:
-  run-colab-medvitrina:
+  run-script1:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout репозитория
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Установка Python
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Установка зависимостей
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Выполнение Jupyter Notebook для med.vitrina24.kz
+      - name: Execute Jupyter Notebook 1
         run: |
           jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina.ipynb
 
-      - name: Сохранение лог-файла для med.vitrina24.kz
-        uses: actions/upload-artifact@v2
-        with:
-          name: medvitrina-log
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log_medvitrina.txt
-
-  run-colab-vitrina24:
+  run-script2:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout репозитория
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Установка Python
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Установка зависимостей
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Выполнение Jupyter Notebook для vitrina24.kz
+      - name: Execute Jupyter Notebook 2
         run: |
-          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina24.ipynb
-
-      - name: Сохранение лог-файла для vitrina24.kz
-        uses: actions/upload-artifact@v2
-        with:
-          name: vitrina24-log
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log_vitrina24.txt
+          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina.ipynb
