@@ -1,4 +1,4 @@
-name: Schedule Colab Script
+name: Schedule Colab Script for vitrina24.kz
 
 on:
   schedule:
@@ -10,7 +10,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
 
       - name: Set up Python
         uses: actions/setup-python@v2
