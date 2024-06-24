@@ -2,12 +2,13 @@ name: Schedule Colab Scripts for vitrina24.kz and med.vitrina24.kz
 
 on:
   schedule:
-    - cron: '0 7,19 * * *'  # Запуск в 7 утра и 7 вечера по UTC для med.vitrina24.kz
-    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC для vitrina24.kz
+    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC для med.vitrina24.kz
+    - cron: '0 9,21 * * *'  # Запуск в 9 утра и 9 вечера по UTC для vitrina24.kz
 
 jobs:
   run-medvitrina24:
     runs-on: ubuntu-latest
+    name: Run index_medvitrina__200.ipynb
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -23,18 +24,23 @@ jobs:
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Execute med.vitrina24.kz Notebook
+      - name: Execute index_medvitrina__200.ipynb
         run: |
           jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb
 
-      - name: Save log file for med.vitrina24.kz
+      - name: Send start notification to Telegram
+        run: |
+          python send_telegram_message.py '/content/gdrive/MyDrive/Colab Notebooks/tgtokenvitrina24kz.txt' '-1002207415181' 'Запущен планировщик на индекс med.vitrina24.kz'
+
+      - name: Save log file
         uses: actions/upload-artifact@v2
         with:
-          name: medvitrina24-log
-          path: /content/gdrive/MyDrive/Colab Notebooks/indexing_log.txt
+          name: script-log
+          path: /content/drive/MyDrive/Colab Notebooks/indexing_log.txt
 
   run-vitrina24:
     runs-on: ubuntu-latest
+    name: Run index_vitrina__200.ipynb
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -50,12 +56,16 @@ jobs:
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Execute vitrina24.kz Notebook
+      - name: Execute index_vitrina__200.ipynb
         run: |
           jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina24.ipynb
 
-      - name: Save log file for vitrina24.kz
+      - name: Send start notification to Telegram
+        run: |
+          python send_telegram_message.py '/content/gdrive/MyDrive/Colab Notebooks/tgtokenvitrina24kz.txt' '-1002207415181' 'Запущен планировщик на индекс vitrina24.kz'
+
+      - name: Save log file
         uses: actions/upload-artifact@v2
         with:
-          name: vitrina24-log
-          path: /content/gdrive/MyDrive/Colab Notebooks/indexing_log.txt
+          name: script-log
+          path: /content/drive/MyDrive/Colab Notebooks/indexing_log.txt
