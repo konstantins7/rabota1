@@ -2,8 +2,8 @@ name: Планирование скриптов для vitrina24.kz и med.vitri
 
 on:
   schedule:
-    - cron: '0 7,19 * * *'  # Запуск в 7 утра и 7 вечера по UTC для med.vitrina24.kz
-    - cron: '0 8,20 * * *'  # Запуск в 8 утра и 8 вечера по UTC для vitrina24.kz
+    - cron: '5 7,19 * * *'   # Запуск в 7:05 утра и 7:05 вечера по UTC для med.vitrina24.kz
+    - cron: '5 8,20 * * *'   # Запуск в 8:05 утра и 8:05 вечера по UTC для vitrina24.kz
 
 jobs:
   run-colab-medvitrina:
