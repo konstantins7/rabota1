@@ -1,0 +1,43 @@
+on:
+  schedule:
+    - cron: '30 7,19 * * *'   # Запуск в 7:30 и 19:30 UTC
+    - cron: '30 8,20 * * *'   # Запуск в 8:30 и 20:30 UTC
+
+jobs:
+  run-script1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbconvert
+          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
+
+      - name: Execute Jupyter Notebook 1
+        run: |
+          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina.ipynb
+
+  run-script2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbconvert
+          pip install google-auth requests pandas google-api-python-client beautif
