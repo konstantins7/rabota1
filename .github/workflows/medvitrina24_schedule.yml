@@ -1,0 +1,27 @@
+name: Scheduled Scripts for med.vitrina24.kz
+
+on:
+  schedule:
+    - cron: '5 7,19 * * *'  # Запуск в 7:05 и 19:05 по UTC
+
+jobs:
+  run-medvitrina24-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbconvert
+          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
+
+      - name: Execute med.vitrina24.kz script
+        run: |
+          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb
