@@ -1,11 +1,7 @@
-name: Schedule Scripts
-
+name: Run MedVitrina24 Script
 on:
   schedule:
-    - cron: '0 13 * * *'   # Запуск в 13:00 UTC (для мед витрины)
-    - cron: '0 1 * * *'    # Запуск в 01:00 UTC (для мед витрины)
-    - cron: '0 14 * * *'   # Запуск в 14:00 UTC (для витрины)
-    - cron: '0 2 * * *'    # Запуск в 02:00 UTC (для витрины)
+    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00 каждый день
 
 jobs:
   run-medvitrina24-script:
@@ -13,33 +9,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20.x'  # Используем Node.js версии 20.x
-
+      
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'  # Используем актуальную версию Python 3.x
+          python-version: '3.x'  # Указать версию Python, если необходимо
 
-      # Добавьте дополнительные шаги для выполнения скрипта med.vitrina24 здесь
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Замените на установку необходимых пакетов
+      
+      - name: Execute MedVitrina24 script
+        run: |
+          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb --ExecutePreprocessor.kernel_name=python3
 
-  run-vitrina24-script:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20.x'  # Используем Node.js версии 20.x
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'  # Используем актуальную версию Python 3.x
-
-      # Добавьте дополнительные шаги для выполнения скрипта vitrina24 здесь
+      - name: Save and commit results
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add result_medvitrina24.ipynb
+          git commit -m "Automated execution results"
+          git push
