@@ -1,15 +1,15 @@
-name: Scheduled Scripts for vitrina24.kz
+name: Schedule Scripts for vitrina24.kz
 
 on:
   schedule:
-    - cron: '5 8,20 * * *'  # Запуск в 8:05 и 20:05 по UTC
+    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00
 
 jobs:
-  run-vitrina24-script:
+  run-script-vitrina24:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -22,6 +22,12 @@ jobs:
           pip install nbconvert
           pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Execute vitrina24.kz script
+      - name: Execute Jupyter Notebook for vitrina24.kz
         run: |
-          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina24.ipynb
+          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina.ipynb
+
+      - name: Save log file for vitrina24.kz
+        uses: actions/upload-artifact@v2
+        with:
+          name: script-log-vitrina
+          path: /content/drive/MyDrive/Colab Notebooks/indexing_log_vitrina.txt
