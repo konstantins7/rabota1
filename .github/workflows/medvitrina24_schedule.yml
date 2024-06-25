@@ -11,17 +11,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          ref: main  # Указываете ветку, если это необходимо
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20'
+          node-version: '16'  # Уточните актуальную версию Node.js, например, '16'
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.x'  # Уточните версию Python, например, '3.x'
 
-      # Добавьте дополнительные шаги для выполнения скрипта мед витрина здесь
+      # Добавьте дополнительные шаги для выполнения скрипта med.vitrina24 здесь
+
+  run-vitrina24-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Уточните актуальную версию Node.js, например, '16'
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Уточните версию Python, например, '3.x'
+
+      # Добавьте дополнительные шаги для выполнения скрипта vitrina24 здесь
