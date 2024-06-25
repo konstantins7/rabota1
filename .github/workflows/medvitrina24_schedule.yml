@@ -1,4 +1,4 @@
-name: Schedule Scripts med vitrina24
+name: Schedule Scripts
 
 on:
   schedule:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'  # Укажите актуальную версию Node.js
+          node-version: '20.x'  # Укажите актуальную версию Node.js
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -35,7 +35,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'  # Укажите актуальную версию Node.js
+          node-version: '20.x'  # Укажите актуальную версию Node.js
 
       - name: Set up Python
         uses: actions/setup-python@v2
