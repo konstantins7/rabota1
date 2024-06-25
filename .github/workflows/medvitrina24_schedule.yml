@@ -1,33 +1,27 @@
-name: Schedule Scripts for med.vitrina24.kz
+name: Schedule Scripts
 
 on:
   schedule:
-    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00
+    - cron: '0 13 * * *'   # Запуск в 13:00 UTC (для мед витрины)
+    - cron: '0 1 * * *'    # Запуск в 01:00 UTC (для мед витрины)
 
 jobs:
-  run-script-medvitrina24:
+  run-medvitrina24-script:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+        with:
+          ref: main  # Указываете ветку, если это необходимо
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install nbconvert
-          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
-
-      - name: Execute Jupyter Notebook for med.vitrina24.kz
-        run: |
-          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina.ipynb
-
-      - name: Save log file for med.vitrina24.kz
-        uses: actions/upload-artifact@v2
-        with:
-          name: script-log-medvitrina
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log_medvitrina.txt
+      # Добавьте дополнительные шаги для выполнения скрипта мед витрина здесь
