@@ -1,7 +1,11 @@
-name: Run MedVitrina24 Script
+name: Execute MedVitrina24 script
+
 on:
+  push:
+    branches:
+      - main
   schedule:
-    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00 каждый день
+    - cron: '0 0 * * *'  # Запускать каждый день в полночь UTC
 
 jobs:
   run-medvitrina24-script:
@@ -15,19 +19,23 @@ jobs:
         with:
           python-version: '3.x'  # Указать версию Python, если необходимо
 
-      - name: Install dependencies
+      - name: Install Jupyter
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Замените на установку необходимых пакетов
-      
-      - name: Execute MedVitrina24 script
+          pip install jupyter
+
+      - name: Execute notebook with nbconvert
         run: |
           jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb --ExecutePreprocessor.kernel_name=python3
 
       - name: Save and commit results
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add result_medvitrina24.ipynb
-          git commit -m "Automated execution results"
-          git push
+          git commit -m "Auto-generated notebook result"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
