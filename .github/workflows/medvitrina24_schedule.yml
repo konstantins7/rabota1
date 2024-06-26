@@ -2,7 +2,7 @@ name: Indexing for med.vitrina24.kz
 
 on:
   schedule:
-    - cron: '0 15,3 * * *'  # Запуск в 13:00 и 01:00 UTC
+    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00 UTC
 
 jobs:
   index-vitrina24:
