@@ -1,41 +1,184 @@
-name: Execute MedVitrina24 script
+name: Indexing for med.vitrina24.kz
 
 on:
-  push:
-    branches:
-      - main
   schedule:
-    - cron: '0 0 * * *'  # Запускать каждый день в полночь UTC
+    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00 UTC
 
 jobs:
-  run-medvitrina24-script:
+  index-vitrina24:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-      
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'  # Указать версию Python, если необходимо
+          python-version: '3.x'
 
-      - name: Install Jupyter
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install jupyter
+          pip install google-auth requests pandas google-api-python-client beautifulsoup4 lxml
 
-      - name: Execute notebook with nbconvert
+      - name: Execute Python script
+        env:
+          MED_VITRINA_KEY_FILE: ${{ secrets.MEDVITRINA24KZ61856B49EC6E }}
+          TELEGRAM_TOKEN_FILE: ${{ secrets.TGTOKENVITRINA24KZ }}
+          TELEGRAM_CHAT_ID: '-1002207415181'
         run: |
-          jupyter nbconvert --to notebook --execute index_medvitrina__200.ipynb --output result_medvitrina24.ipynb --ExecutePreprocessor.kernel_name=python3
+          import requests
+          import pandas as pd
+          import datetime
+          import os
+          import urllib.request
+          from bs4 import BeautifulSoup
+          from google.oauth2 import service_account
+          from google.auth.transport.requests import AuthorizedSession
+          import time
 
-      - name: Save and commit results
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add result_medvitrina24.ipynb
-          git commit -m "Auto-generated notebook result"
-      
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Paths and settings
+          MED_VITRINA_KEY_FILE_LOCATION = '/github/workspace/medvitrina24kz-61856b49ec6e.json'
+          MED_VITRINA_TXT_FILE_PATH = '/github/workspace/medvitrina24_urls.txt'
+          MED_VITRINA_PROGRESS_FILE_PATH = '/github/workspace/medvitrina24_indexing_progress.csv'
+          MED_VITRINA_SITEMAP_URL = 'https://med.vitrina24.kz/sitemap.xml'
+          INDEXING_URL = "https://indexing.googleapis.com/v3/urlNotifications:publish"
+          DAILY_QUOTA = 200
+          SCOPES = ["https://www.googleapis.com/auth/indexing"]
+
+          # Function to load Telegram token
+          def load_telegram_token(token_file):
+              token = None
+              with open(token_file, 'r') as file:
+                  token = file.read().strip()
+              return token
+
+          # Function to send message to Telegram
+          def send_telegram_message(token, chat_id, message):
+              url = f'https://api.telegram.org/bot{token}/sendMessage'
+              data = {'chat_id': chat_id, 'text': message}
+              response = requests.post(url, data=data)
+              if response.status_code != 200:
+                  print(f"Error sending message to Telegram: {response.status_code} - {response.text}")
+              return response.json()
+
+          # Function to log messages
+          def log_message(message):
+              print(message)
+              send_telegram_message(load_telegram_token(TELEGRAM_TOKEN_FILE), TELEGRAM_CHAT_ID, message)
+
+          # Function to check file existence
+          def check_file_exists(file_path):
+              if not os.path.exists(file_path):
+                  log_message(f"Error: File {file_path} not found.")
+                  return False
+              return True
+
+          # Function to get URLs from sitemap
+          def get_urls_from_sitemap(sitemap_url):
+              sitemap_urls = []
+              try:
+                  response = urllib.request.urlopen(sitemap_url)
+                  soup = BeautifulSoup(response, 'xml')
+                  for loc in soup.find_all('loc'):
+                      sitemap_urls.append(loc.text)
+              except Exception as e:
+                  log_message(f"Error fetching sitemap: {e}")
+              return sitemap_urls
+
+          # Function to publish URL for indexing
+          def publish_url(url, authed_session):
+              data = {
+                  "url": url,
+                  "type": "URL_UPDATED"
+              }
+              response = authed_session.post(INDEXING_URL, json=data)
+              return response
+
+          # Main function to index URLs
+          def index_urls():
+              # Check if key file exists
+              if not check_file_exists(MED_VITRINA_KEY_FILE_LOCATION):
+                  return
+
+              # Send message about indexing start
+              send_telegram_message(load_telegram_token(TELEGRAM_TOKEN_FILE), TELEGRAM_CHAT_ID, "Indexing started for med.vitrina24.kz.")
+
+              try:
+                  credentials = service_account.Credentials.from_service_account_file(MED_VITRINA_KEY_FILE_LOCATION, scopes=SCOPES)
+                  authed_session = AuthorizedSession(credentials)
+                  log_message("Credentials created successfully and session authorized.")
+              except Exception as e:
+                  log_message(f"Error creating credentials: {e}")
+                  return
+
+              # Load data from TXT file or sitemap
+              if check_file_exists(MED_VITRINA_TXT_FILE_PATH):
+                  with open(MED_VITRINA_TXT_FILE_PATH, 'r') as file:
+                      urls = [line.strip() for line in file]
+                  log_message(f"File {MED_VITRINA_TXT_FILE_PATH} read successfully.")
+              else:
+                  urls = get_urls_from_sitemap(MED_VITRINA_SITEMAP_URL)
+                  with open(MED_VITRINA_TXT_FILE_PATH, 'w') as file:
+                      for url in urls:
+                          file.write(f"{url}\n")
+                  log_message(f"New file {MED_VITRINA_TXT_FILE_PATH} created with URLs from sitemap.")
+
+              # Create or load progress file
+              try:
+                  progress = pd.read_csv(MED_VITRINA_PROGRESS_FILE_PATH)
+                  log_message(f"Progress file {MED_VITRINA_PROGRESS_FILE_PATH} loaded successfully.")
+              except FileNotFoundError:
+                  progress = pd.DataFrame(urls, columns=['Product URL'])
+                  progress['Indexed'] = False
+                  progress.to_csv(MED_VITRINA_PROGRESS_FILE_PATH, index=False)
+                  log_message(f"New progress file created: {MED_VITRINA_PROGRESS_FILE_PATH}")
+
+              # Check quota before indexing
+              try:
+                  response = authed_session.get(f"https://indexing.googleapis.com/v3/urlNotifications/metadata?url=https://med.vitrina24.kz")
+                  quota_info = response.json()
+                  log_message(f"Quota information: {quota_info}")
+              except Exception as e:
+                  log_message(f"Error checking quota: {e}")
+                  return
+
+              # Track number of URLs sent today
+              urls_sent_today = 0
+              start_time = time.time()
+              for index, row in progress.iterrows():
+                  if urls_sent_today >= DAILY_QUOTA:
+                      log_message("Daily quota reached. Try again tomorrow.")
+                      break
+
+                  if not row['Indexed']:
+                      url = row['Product URL']
+                      response = publish_url(url, authed_session)
+
+                      if response.status_code == 200:
+                          progress.at[index, 'Indexed'] = True
+                          urls_sent_today += 1
+                          log_message(f"URL sent successfully: {url}")
+                      elif response.status_code == 429:
+                          log_message("Daily quota reached. Try again tomorrow.")
+                          break
+                      elif response.status_code == 403:
+                          log_message(f"Error sending {url}: {response.status_code} {response.json()}")
+                          break
+                      else:
+                          log_message(f"Error sending {url}: {response.status_code} {response.json()}")
+
+                      # Check for long operation
+                      if time.time() - start_time > 300:
+                          log_message("Long operation - continuing indexing.")
+                          start_time = time.time()
+
+              # Save progress file
+              progress.to_csv(MED_VITRINA_PROGRESS_FILE_PATH, index=False)
+              log_message(f"Progress saved to file {MED_VITRINA_PROGRESS_FILE_PATH}")
+
+              # Send message about indexing completion
+              send_telegram_message(load_telegram_token(TELEGRAM_TOKEN_FILE), TELEGRAM_CHAT_ID, "Indexing completed for med.vitrina24.kz.")
+
+          # Call the main indexing function
+          index_urls()
