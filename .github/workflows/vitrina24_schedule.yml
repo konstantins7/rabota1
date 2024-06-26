@@ -1,4 +1,4 @@
-name: Schedule Scripts for med.vitrina24.kz
+name: Schedule Scripts for vitrina24.kz
 
 on:
   schedule:
