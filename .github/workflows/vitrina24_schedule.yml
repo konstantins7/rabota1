@@ -1,8 +1,8 @@
-name: Schedule Scripts for vitrina24.kz
+name: Schedule Scripts for med.vitrina24.kz
 
 on:
   schedule:
-    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00
+    - cron: '0 13,1 * * *'  # Запуск в 13:00 и 01:00 UTC
 
 jobs:
   run-script-vitrina24:
@@ -24,10 +24,11 @@ jobs:
 
       - name: Execute Jupyter Notebook for vitrina24.kz
         run: |
-          jupyter nbconvert --to notebook --execute index_vitrina__200.ipynb --output result_vitrina.ipynb
+          jupyter nbconvert --execute index_vitrina__200.ipynb --to notebook --output result_vitrina.ipynb
 
       - name: Save log file for vitrina24.kz
         uses: actions/upload-artifact@v2
         with:
           name: script-log-vitrina
-          path: /content/drive/MyDrive/Colab Notebooks/indexing_log_vitrina.txt
+          path: result_vitrina.ipynb  # Путь к результату выполнения скрипта
+
