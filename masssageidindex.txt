@@ -1,0 +1,2 @@
+{'ok': True, 'result': {'message_id': 4, 'sender_chat': {'id': -1002207415181, 'title': 'Index Vitrina24', 'username': 'indexnowmedvitrina24kz', 'type': 'channel'}, 'chat': {'id': -1002207415181, 'title': 'Index Vitrina24', 'username': 'indexnowmedvitrina24kz', 'type': 'channel'}, 'date': 1719225354, 'text': 'Это тестовое сообщение для получения ID канала.'}}
+chat_id: -1002207415181
